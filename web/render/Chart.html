@@ -1,0 +1,332 @@
+<html>
+<head>
+<meta name="viewport" content="user-scalable=no" />
+<style type="text/css">
+html,body,div {
+	margin: 0;
+	padding: 0;
+}
+
+* {
+	-webkit-user-select: none;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.chartTooltip {
+	font-family: Helvetica;
+	font-size: 14;
+	display: none;
+	position: absolute;
+	max-width: 300px;
+	padding: 3px 5px;
+	overflow: hidden;
+	border: 2px solid black;
+	border-radius: 3px;
+}
+
+.chartTooltipArrow {
+	display: none;
+	position: absolute;
+}
+</style>
+<script type="text/javascript" src="charts.js"></script>
+<script>
+	var ARROW_WIDTH = 20;
+	var ARROW_HEIGHT = 20;
+	var ARROW_DISTANCE = 10;
+	var TOOLTIP_DISTANCE = 10;
+	var TOOLTIP_BORDER = 2;
+	var OVERFLOW_LIMIT = 20;
+
+	function tooltipSorter(a, b) {
+		return a.y - b.y;
+	}
+
+	function drawArrow(i, from, to, x, side, color) {
+		var elem = document.getElementById('tooltipArrow' + i);
+
+		// arrow positioning
+		var width = ARROW_WIDTH + TOOLTIP_BORDER; // width is always the same
+		var height = Math.abs(from - to) + ARROW_HEIGHT; // height depends on where we're pointing
+		elem.width = width * window.devicePixelRatio;
+		elem.height = height * window.devicePixelRatio;
+		elem.style.width = width;
+		elem.style.height = height;
+		elem.style.display = 'block';
+		elem.style.visibility = 'visible';
+		var top = (from > to ? to : from) - ARROW_HEIGHT / 2;
+
+		elem.style.top = top + 'px';
+		if (side == 1)
+			x = x - ARROW_WIDTH - TOOLTIP_BORDER;
+		elem.style.left = x + 'px';
+
+		var context = elem.getContext('2d');
+
+		q = Math.abs(from - to) / 7;
+		if (q > TOOLTIP_DISTANCE / 2) {
+			q = TOOLTIP_DISTANCE / 2;
+		}
+
+		// draw the arrow
+		context.save();
+		context.scale(window.devicePixelRatio, window.devicePixelRatio);
+		context.lineWidth = TOOLTIP_BORDER + 1;
+		context.fillStyle = '#ffffff';
+		context.strokeStyle = color;
+		context.beginPath();
+		context.moveTo(side ? 0 : ARROW_WIDTH + TOOLTIP_BORDER, (to - top)
+				- ARROW_HEIGHT / 2 + 1);
+		context.lineTo(side ? ARROW_WIDTH + TOOLTIP_BORDER - ARROW_DISTANCE + q
+				: ARROW_DISTANCE - q, from - top);
+		context.lineTo(side ? 0 : ARROW_WIDTH + TOOLTIP_BORDER, (to - top)
+				+ ARROW_HEIGHT / 2 - 1);
+		context.stroke();
+		context.fill();
+		context.closePath();
+		context.restore();
+	}
+
+	var onShowTooltips = function(tooltips) {
+		var tooltipsRightLimit = null;
+		var tooltipsLeftLimit = null;
+		var tooltipsRightTarget = null;
+		var tooltipsLeftTarget = null;
+
+		tooltips.sort(tooltipSorter);
+
+		// Basic placement and rendering
+		for (i = 0; i <= 5; i++) {
+			var tooltipDiv = document.getElementById("tooltipText" + i);
+			var tooltipArrowDiv = document.getElementById("tooltipArrow" + i);
+			if (i < tooltips.length) {
+				tooltipDiv.style.display = 'block';
+				tooltipDiv.style.visibility = 'visible';
+				var tooltip = tooltips[i];
+				tooltipDiv.style.backgroundColor = '#ffffff';
+				if (tooltip.color) {
+					tooltipDiv.style.borderColor = tooltip.color;
+					tooltipDiv.style.color = tooltip.color;
+				} else {
+					tooltipDiv.style.borderColor = 'black';
+					tooltipDiv.style.color = 'black';
+				}
+				tooltipDiv.style.borderWidth = TOOLTIP_BORDER + 'px';
+				tooltipDiv.innerHTML = tooltip.text;
+			} else {
+				tooltipDiv.style.display = 'none';
+				tooltipArrowDiv.style.display = 'none';
+			}
+		}
+
+		for (i = 0; i <= 5; i++) {
+			if (i < tooltips.length) {
+				var tooltipDiv = document.getElementById("tooltipText" + i);
+				var tooltip = tooltips[i];
+
+				var x = parseFloat(tooltip.x);
+				var y = parseFloat(tooltip.y);
+
+				// vertically enter the label
+				y = y - tooltipDiv.clientHeight / 2;
+
+				var pointY = y;
+				var arrowY = (y + tooltipDiv.clientHeight / 2);
+
+				// check for overflow on both sides
+				var overflowRight = (x + ARROW_WIDTH + tooltipDiv.clientWidth > document.documentElement.clientWidth
+						- OVERFLOW_LIMIT);
+				var overflowLeft = (x - ARROW_WIDTH - tooltipDiv.clientWidth < OVERFLOW_LIMIT);
+
+				var side = 0; // Right side by default
+				if (overflowRight) {
+					if (tooltipsLeftLimit !== null && y < tooltipsLeftLimit) {
+						y = tooltipsLeftLimit;
+					}
+					side = 1; // side left
+				} else if (overflowLeft) {
+					if (tooltipsRightLimit !== null && y < tooltipsRightLimit) {
+						y = tooltipsRightLimit;
+					}
+					side = 0; // side right
+				} else if (tooltipsRightLimit !== null
+						&& y < tooltipsRightLimit) {
+					// Problem on right side
+					if (tooltipsLeftLimit === null || y >= tooltipsLeftLimit) {
+						// Can be side to right side
+						if (tooltipsLeftLimit !== null)
+							y = tooltipsLeftLimit;
+						side = 1; // side left	
+					} else {
+						// Problem on both sides
+						if (tooltipsLeftLimit - y < tooltipsRightLimit - y) {
+							y = tooltipsLeftLimit;
+							side = 1;
+						} else {
+							y = tooltipsRightLimit;
+							side = 0;
+						}
+					}
+				}
+
+				// calculate arrow position
+				var arrowFrom = pointY + tooltipDiv.clientHeight / 2;
+				if (arrowY < (y + ARROW_HEIGHT / 2 + TOOLTIP_BORDER)) {
+					arrowY = y + ARROW_HEIGHT / 2 + TOOLTIP_BORDER;
+					arrowFrom += 4;
+				} else if (arrowY > (y + tooltipDiv.clientHeight - ARROW_HEIGHT
+						/ 2 - TOOLTIP_BORDER)) {
+					arrowY = y + tooltipDiv.clientHeight - ARROW_HEIGHT / 2
+							- TOOLTIP_BORDER;
+					arrowFrom -= 4;
+				}
+
+				if (side == 1) {
+					if (tooltipsLeftTarget !== null) {
+						if (arrowFrom < tooltipsLeftTarget) {
+							arrowFrom = tooltipsLeftTarget;
+						}
+					}
+					tooltipsLeftTarget = arrowFrom + TOOLTIP_DISTANCE;
+				} else {
+					if (tooltipsRightTarget !== null) {
+						if (arrowFrom < tooltipsRightTarget) {
+							arrowFrom = tooltipsRightTarget;
+						}
+					}
+					tooltipsRightTarget = arrowFrom + TOOLTIP_DISTANCE;
+				}
+
+				drawArrow(i, arrowFrom, arrowY, x, side, tooltip.color);
+
+				if (side == 0) {
+					tooltipsRightLimit = y + tooltipDiv.clientHeight
+							+ TOOLTIP_DISTANCE;
+					x = x + ARROW_WIDTH;
+				} else {
+					tooltipsLeftLimit = y + tooltipDiv.clientHeight
+							+ TOOLTIP_DISTANCE;
+					x = x - tooltipDiv.clientWidth - ARROW_WIDTH
+							- TOOLTIP_BORDER * 2;
+				}
+
+				tooltipDiv.style.left = x + 'px';
+				tooltipDiv.style.top = y + 'px';
+				tooltipDiv.style.display = 'block';
+				tooltipDiv.style.visibility = 'visible';
+			}
+		}
+
+	};
+	var onmouseout = function() {
+		for (i = 0; i <= 5; i++) {
+			var tooltip = document.getElementById("tooltipText" + i);
+			tooltip.style.visibility = 'hidden';
+			var tooltipArrowDiv = document.getElementById("tooltipArrow" + i);
+			tooltipArrowDiv.style.visibility = 'hidden';
+		}
+	};
+
+	// various options for the chart renderer
+	Charts.options.showsTouchLine = true
+	Charts.options.onShowTooltips = onShowTooltips;
+	Charts.options.font = "Helvetica";
+	Charts.options.fontSize = 15;
+	Charts.options.fontHeight = 15;
+
+	Charts.options.padding.top = 10;
+	Charts.options.padding.bottom = 10;
+	Charts.options.padding.left = 10;
+	Charts.options.padding.right = 10;
+
+	Charts.options.line.shadow = true;
+	Charts.options.line.shadowColor = 'rgba(0,0,0,0.5)';
+	Charts.options.line.shadowBlur = 15;
+	Charts.options.line.shadowOffsetX = 0;
+	Charts.options.line.shadowOffsetY = 0;
+	Charts.options.bar.shadow = true;
+	Charts.options.bar.shadowColor = 'rgba(0,0,0,0.3)';
+	Charts.options.bar.shadowBlur = 15;
+	Charts.options.bar.shadowOffsetX = 3;
+	Charts.options.bar.shadowOffsetY = 3;
+	Charts.options.candle.shadow = true;
+	Charts.options.candle.shadowColor = 'rgba(0,0,0,0.3)';
+	Charts.options.candle.shadowBlur = 15;
+	Charts.options.candle.shadowOffsetX = 3;
+	Charts.options.candle.shadowOffsetY = 3;
+	Charts.options.pie.gradient = true;
+	Charts.options.thermometer.gradient = true;
+	Charts.options.funnel.gradient = true;
+	Charts.options.speedometer.gradient = true;
+
+	var chartSize = {
+		width : 100,
+		height : 100
+	};
+
+	function renderChart(chart, context) {
+		context.save();
+		context.scale(window.devicePixelRatio, window.devicePixelRatio);
+		chart.resize(chartSize.width, chartSize.height);
+		chart.render(context);
+		context.restore();
+	}
+
+	function resizeTo(width, height) {
+		if (chartSize.width === width && chartSize.height === height) {
+			return;
+		}
+		chartSize.width = width;
+		chartSize.height = height;
+		var canvas = document.getElementById("chart");
+		canvas.height = 1;
+		canvas.width = 1;
+		canvas.height = height * window.devicePixelRatio;
+		canvas.width = width * window.devicePixelRatio;
+		canvas.style.width = width;
+		canvas.style.height = height;
+	}
+
+	function init(data) {
+		resizeTo(document.body.scrollWidth, document.body.scrollHeight);
+		var chart = Charts.create(data.content);
+
+		var canvas = document.getElementById("chart");
+		var context = canvas.getContext("2d");
+
+		chart.init(context);
+		chart.addTooltipListener(canvas);
+
+		renderChart(chart, context);
+	}
+</script>
+</head>
+<body>
+	<canvas id="chart"></canvas>
+	<div class="chartTooltip" id="tooltipText0"></div>
+	<div class="chartTooltip" id="tooltipText1"></div>
+	<div class="chartTooltip" id="tooltipText2"></div>
+	<div class="chartTooltip" id="tooltipText3"></div>
+	<div class="chartTooltip" id="tooltipText4"></div>
+	<div class="chartTooltip" id="tooltipText5"></div>
+
+	<canvas class="chartTooltipArrow" id="tooltipArrow0" width="10"
+		height="5">
+    </canvas>
+	<canvas class="chartTooltipArrow" id="tooltipArrow1" width="10"
+		height="5">
+    </canvas>
+	<canvas class="chartTooltipArrow" id="tooltipArrow2" width="10"
+		height="5">
+    </canvas>
+	<canvas class="chartTooltipArrow" id="tooltipArrow3" width="10"
+		height="5">
+    </canvas>
+	<canvas class="chartTooltipArrow" id="tooltipArrow4" width="10"
+		height="5">
+    </canvas>
+	<canvas class="chartTooltipArrow" id="tooltipArrow5" width="10"
+		height="5">
+    </canvas>
+</body>
+</html>

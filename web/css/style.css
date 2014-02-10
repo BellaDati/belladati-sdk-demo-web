@@ -1,0 +1,174 @@
+body {
+	font-family: Helvetica, Arial, sans-serif;
+	color: #444;
+	margin: 0;
+}
+
+a {
+	text-decoration: none;
+}
+
+.login {
+	margin-top: 6em;
+	text-align: center;
+}
+
+.login img {
+	display: block;
+	margin: 1em auto;
+}
+
+.login input {
+	background: #006600;
+	border: none;
+	border-radius: 1em;
+	padding: 1em 2em;
+	font-size: 100%;
+	color: #FFFFFF;
+	cursor: pointer;
+}
+
+header {
+	display: block;
+	position: absolute;
+	top: 0;
+	width: 100%;
+	height: 4em;
+	background: url('../images/logo.png') left center no-repeat #EBEBEB;
+	background-image: url('../images/logo.png'), -ms-linear-gradient(top, #ffffff 0%, #99CC99 95%, #66CC66 100%);
+	background-image: url('../images/logo.png'), -webkit-gradient(linear, left top, left bottom, color-stop(0, rgb(255,
+		255, 255)), color-stop(0.95, rgb(153, 204, 153)),
+		color-stop(1, rgb(102, 204, 102)));
+	background-image: url('../images/logo.png'), -moz-linear-gradient(center top, rgb(255, 255, 255) 0%,
+		rgb(153, 204, 153) 95%, rgb(102, 204, 102) 100%);
+	filter: none;
+}
+
+header .logout {
+	position: absolute;
+	right: 2em;
+	bottom: 1.5em;
+	color: #006600;
+}
+
+header ~ * {
+	margin-top: 4em;
+}
+
+#page-content {
+	padding-left: 1em;
+	padding-right: 1em;
+	width: 100%;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+}
+
+h1 {
+	font-size: x-large;
+	font-weight: bold;
+}
+
+.wrapper {
+	display: inline-block;
+	vertical-align: top;
+	border: 1px solid #EBEBEB;
+	border-radius: 1em;
+	text-align: center;
+	min-width: 240px;
+	min-height: 240px;
+}
+
+.title {
+	display: block;
+	color: #FFFFFF;
+	background-color: #339933;
+	border-top-left-radius: 1em;
+	border-top-right-radius: 1em;
+	padding: 0.5em 1em;
+}
+
+.content {
+	height: 400px;
+	width: 500px;
+	margin: 0.5em 1em;
+	border: none;
+}
+
+.filter {
+	display: inline-block;
+	margin-bottom: 1em;
+}
+
+.filter {
+	margin-right: 6em;
+}
+
+.filter-attribute {
+	display: inline-block;
+	vertical-align: top;
+	margin-left: 2em;
+}
+
+.filter-title {
+	display: block;
+	margin-bottom: 0.5em;
+	font-weight: bold;
+}
+
+.filter-items {
+	max-height: 8em;
+	overflow: auto;
+	padding-right: 2em;
+	white-space: nowrap;
+}
+
+.filter .buttons {
+	text-align: right;
+	margin-top: 0.5em;
+}
+
+section,.comments {
+	display: inline-block;
+	vertical-align: top;
+}
+
+section {
+	width: 80%;
+}
+
+.comments {
+	margin-left: 2%;
+	width: 18%;
+}
+
+.comments form input {
+	margin-top: 0.5em;
+	margin-left: auto;
+}
+
+.comments form>* {
+	display: block;
+}
+
+.comments form textarea {
+	width: 100%;
+	height: 7em;
+	box-sizing: border-box;
+}
+
+.comment-list {
+	margin-top: 2em;
+}
+
+.comment {
+	display: table-row;
+}
+
+.comment-text,.comment-author {
+	padding: 0.1em 0.5em;
+	display: table-cell;
+}
+
+.comment-author>span {
+	color: #339933;
+}
