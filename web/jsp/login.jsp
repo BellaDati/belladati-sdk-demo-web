@@ -11,6 +11,7 @@
 	<form method="POST" action="login" class="login">
 		<img src="${pageContext.request.contextPath}/images/logo.png" /> <input type="submit"
 			value="Please Login" />
+		<div class="login-hint">Try logging in as <strong>api-demo@belladati.com</strong> with password <strong>apiDemo1</strong>.</div>
 	</form>
 </body>
 </html>

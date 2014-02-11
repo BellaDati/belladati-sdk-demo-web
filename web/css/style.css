@@ -28,6 +28,14 @@ a {
 	cursor: pointer;
 }
 
+.login .login-hint {
+	margin-top: 5em;
+}
+
+.login .login-hint strong {
+	color: #006600;
+}
+
 header {
 	display: block;
 	position: absolute;
