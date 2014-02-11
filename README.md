@@ -10,11 +10,12 @@ Clone this repository into a directory of your choice. If you're using Eclipse, 
 
     git clone https://github.com/BellaDati/belladati-sdk-demo-web.git
 
-In the repository, open the file `src/com/belladati/demo/controller/AuthorizationController.java`. Find the line below:
+In the repository, open the file `oauth.properties`. Enter your domain's consumer key and consumer secret:
 
-    OAuthRequest request = serviceManager.initiateOAuth("techKey", "techSecret");
+    consumer.key = your-key-here
+    consumer.secret = your-secret-here
     
-and replace `techKey` with your domain's consumer key, `techSecret` with your consumer secret. You can find more information about how to configure your domain in the [BellaDati SDK documentation](http://support.belladati.com/pages/viewpage.action?pageId=13041944#).
+You can find more information about how to configure your domain for OAuth in the [BellaDati SDK documentation](http://support.belladati.com/pages/viewpage.action?pageId=13041944#).
 
 
 ## Building the Demo

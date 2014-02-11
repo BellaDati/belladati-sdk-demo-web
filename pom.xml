@@ -7,6 +7,14 @@
   <name>BellaDati SDK Web Demo</name>
   <build>
     <sourceDirectory>src</sourceDirectory>
+    <resources>
+   	  <resource>
+   	    <directory>${basedir}</directory>
+   	    <includes>
+   	      <include>oauth.properties</include>
+   	    </includes>
+   	  </resource>
+    </resources>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>

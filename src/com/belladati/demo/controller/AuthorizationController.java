@@ -1,6 +1,7 @@
 package com.belladati.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,6 +20,12 @@ public class AuthorizationController {
 	@Autowired
 	private ServiceManager serviceManager;
 
+	@Value("${consumer.key}")
+	private String key;
+
+	@Value("${consumer.secret}")
+	private String secret;
+
 	/**
 	 * Shows the login page.
 	 */
@@ -33,7 +40,7 @@ public class AuthorizationController {
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ModelAndView login() {
 		// replace key and secret by your domain's key/secret
-		OAuthRequest request = serviceManager.initiateOAuth("techKey", "techSecret");
+		OAuthRequest request = serviceManager.initiateOAuth(key, secret);
 		return new ModelAndView("redirect:" + request.getAuthorizationUrl());
 	}
 
