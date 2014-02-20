@@ -1,5 +1,7 @@
 package com.belladati.demo.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -38,10 +40,11 @@ public class AuthorizationController {
 	 * Redirects the user to BellaDati for OAuth authorization.
 	 */
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public ModelAndView login() {
+	public ModelAndView login(HttpServletRequest request) {
 		// replace key and secret by your domain's key/secret
-		OAuthRequest request = serviceManager.initiateOAuth(key, secret);
-		return new ModelAndView("redirect:" + request.getAuthorizationUrl());
+		OAuthRequest oAuthRequest = serviceManager.initiateOAuth(key, secret);
+		return new ModelAndView("redirect:" + oAuthRequest.getAuthorizationUrl() + "?callbackUrl=" + getDeploymentUrl(request)
+			+ "/authorize");
 	}
 
 	/**
@@ -63,4 +66,15 @@ public class AuthorizationController {
 		return new ModelAndView("redirect:/");
 	}
 
+	/**
+	 * Finds the root URL of the current deployment based on the user's request.
+	 * 
+	 * @param request request from the user
+	 * @return the deployment root, including scheme, server, port, and path
+	 */
+	private String getDeploymentUrl(HttpServletRequest request) {
+		String requestUrl = request.getRequestURL().toString();
+		String servletPath = request.getServletPath();
+		return requestUrl.substring(0, requestUrl.length() - servletPath.length());
+	}
 }
