@@ -10,7 +10,7 @@
 </head>
 <body>
 	<header>
-		<a class="logout" href="${pageContext.request.contextPath}/logout">Logout</a>
+		<a class="logout button" href="${pageContext.request.contextPath}/logout">Logout</a>
 	</header>
 	<div id="page-content">
 		<section>
