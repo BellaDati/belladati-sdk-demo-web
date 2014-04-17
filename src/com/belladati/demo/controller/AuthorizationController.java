@@ -43,8 +43,7 @@ public class AuthorizationController {
 	public ModelAndView login(HttpServletRequest request) {
 		// replace key and secret by your domain's key/secret
 		OAuthRequest oAuthRequest = serviceManager.initiateOAuth(key, secret);
-		return new ModelAndView("redirect:" + oAuthRequest.getAuthorizationUrl() + "?callbackUrl=" + getDeploymentUrl(request)
-			+ "/authorize");
+		return new ModelAndView("redirect:" + oAuthRequest.getAuthorizationUrl(getDeploymentUrl(request) + "/authorize"));
 	}
 
 	/**
