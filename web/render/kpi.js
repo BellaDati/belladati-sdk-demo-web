@@ -44,4 +44,4 @@ KPI.create = function(id, data) {
 		caption.innerHTML = value.caption;
 		entry.appendChild(caption);
 	}
-}
+};

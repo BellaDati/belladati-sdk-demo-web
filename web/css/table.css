@@ -1,0 +1,79 @@
+.table .content {
+	overflow: hidden;
+	color: #585858;
+}
+
+.table-layout {
+	display: table;
+	height: 100%;
+}
+
+.row {
+	display: table-row;
+}
+
+.tile {
+	display: table-cell;
+	vertical-align: top;
+}
+
+#top {
+	overflow-x: hidden;
+}
+
+#left {
+	overflow-x: scroll;
+	overflow-y: hidden;
+}
+
+#data {
+	overflow: scroll;
+}
+
+.inner table {
+	min-width: 100%;
+	border-collapse: collapse;
+}
+.row .tile:first-child {
+	border-right: 1px solid white;
+}
+.row:first-child .tile {
+	border-bottom: 1px solid white;
+}
+.inner table td,.inner table th {
+	border: 1px solid white;
+}
+.inner table tr:first-child td,.inner table tr:first-child th {
+	border-top: 0;
+}
+.inner table tr:last-child td,.inner table tr:last-child th {
+	border-bottom: 0;
+}
+.inner table td:first-child,.inner table th:first-child {
+	border-left: 0;
+}
+.inner table td:last-child,.inner table th:last-child {
+	border-right: 0;
+}
+
+.inner th,.inner td {
+	white-space: nowrap;
+	padding: 4px;
+}
+
+#top th {
+	text-align: center;
+}
+
+#left th {
+	text-align: left;
+}
+
+#data td {
+	text-align: right;
+}
+
+th {
+	font-weight: normal;
+	background-color: rgb(184, 234, 250);
+}

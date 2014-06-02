@@ -43,7 +43,6 @@ import com.belladati.sdk.report.Comment;
 import com.belladati.sdk.report.Report;
 import com.belladati.sdk.view.View;
 import com.belladati.sdk.view.ViewType;
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Controller handling reports.
@@ -113,14 +112,14 @@ public class ReportController {
 		// query view data
 		List<ViewDisplay> viewDisplays = new ArrayList<>();
 		for (final View view : report.getViews()) {
-			if (view.getType() == ViewType.CHART || view.getType() == ViewType.KPI) {
-				Future<JsonNode> future = service.submit(new Callable<JsonNode>() {
+			if (view.getType() == ViewType.CHART || view.getType() == ViewType.KPI || view.getType() == ViewType.TABLE) {
+				Future<?> future = service.submit(new Callable<Object>() {
 					@Override
-					public JsonNode call() throws Exception {
+					public Object call() throws Exception {
 						if (filterData != null) {
-							return (JsonNode) view.loadContent(filterData.get());
+							return view.loadContent(filterData.get());
 						}
-						return (JsonNode) view.loadContent();
+						return view.loadContent();
 					}
 				});
 				viewDisplays.add(new ViewDisplay(view, future));

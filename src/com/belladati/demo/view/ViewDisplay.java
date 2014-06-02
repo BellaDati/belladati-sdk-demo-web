@@ -1,15 +1,20 @@
 package com.belladati.demo.view;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.belladati.sdk.view.TableView.Table;
 import com.belladati.sdk.view.View;
 import com.belladati.sdk.view.ViewType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * View object representing a single chart or KPI view.
@@ -23,26 +28,14 @@ public class ViewDisplay {
 	private final String id;
 	private final String title;
 	private final ViewType type;
-	private final Future<JsonNode> future;
-	private final String frameSrc;
-	private final String onLoad;
+	private final Future<?> future;
 	private String script;
 
-	public ViewDisplay(View view, Future<JsonNode> future) {
+	public ViewDisplay(View view, Future<?> future) {
 		this.id = view.getType().name().toLowerCase() + "-" + view.getId();
 		this.title = view.getName();
 		this.type = view.getType();
 		this.future = future;
-		if (type == ViewType.CHART) {
-			this.frameSrc = "/render/Chart.html";
-			this.onLoad = "chartLoaded(this.id)";
-		} else if (type == ViewType.KPI) {
-			this.frameSrc = "/render/KPI.html";
-			this.onLoad = "kpiLoaded(this.id)";
-		} else {
-			this.frameSrc = "";
-			this.onLoad = "";
-		}
 	}
 
 	/**
@@ -52,34 +45,77 @@ public class ViewDisplay {
 	public void processFuture() {
 		// get JSON data from the future
 		// then set up a script injecting the JSON into the page
+		if (future == null) {
+			return;
+		}
 		switch (type) {
 		case CHART:
-			if (future != null) {
-				try {
-					script = "chartJson['" + id + "'] = " + new ObjectMapper().writeValueAsString(future.get());
-				} catch (JsonProcessingException e) {
-					logger.log(Level.WARNING, "Error getting data", e);
-				} catch (InterruptedException e) {
-					logger.log(Level.WARNING, "Error getting data", e);
-				} catch (ExecutionException e) {
-					logger.log(Level.WARNING, "Error getting data", e);
-				}
+			try {
+				script = "chartJson['" + id + "'] = " + postProcess((JsonNode) future.get());
+			} catch (JsonProcessingException e) {
+				logger.log(Level.WARNING, "Error getting data", e);
+			} catch (InterruptedException e) {
+				logger.log(Level.WARNING, "Error getting data", e);
+			} catch (ExecutionException e) {
+				logger.log(Level.WARNING, "Error getting data", e);
 			}
 			break;
 		case KPI:
-			if (future != null) {
-				try {
-					script = "kpiJson['" + id + "'] = " + new ObjectMapper().writeValueAsString(future.get());
-				} catch (JsonProcessingException e) {
-					logger.log(Level.WARNING, "Error getting data", e);
-				} catch (InterruptedException e) {
-					logger.log(Level.WARNING, "Error getting data", e);
-				} catch (ExecutionException e) {
-					logger.log(Level.WARNING, "Error getting data", e);
-				}
+			try {
+				script = "kpiJson['" + id + "'] = " + postProcess((JsonNode) future.get());
+			} catch (JsonProcessingException e) {
+				logger.log(Level.WARNING, "Error getting data", e);
+			} catch (InterruptedException e) {
+				logger.log(Level.WARNING, "Error getting data", e);
+			} catch (ExecutionException e) {
+				logger.log(Level.WARNING, "Error getting data", e);
 			}
+			break;
+		case TABLE:
+			try {
+				script = "tableJson['" + id + "'] = " + postProcess((Table) future.get());
+			} catch (InterruptedException e) {
+				logger.log(Level.WARNING, "Error getting data", e);
+			} catch (ExecutionException e) {
+				logger.log(Level.WARNING, "Error getting data", e);
+			}
+			break;
 		default: // do nothing
 		}
+	}
+
+	private String postProcess(JsonNode node) throws JsonProcessingException {
+		return new ObjectMapper().writeValueAsString(node);
+	}
+
+	private String postProcess(final Table table) throws InterruptedException {
+		final int rowCount = table.getRowCount();
+		final int columnCount = table.getColumnCount();
+		final ObjectNode tableNode = new ObjectMapper().createObjectNode();
+
+		ExecutorService service = Executors.newCachedThreadPool();
+		service.submit(new Runnable() {
+			@Override
+			public void run() {
+				tableNode.put("left", table.loadLeftHeader(0, rowCount).get("content"));
+			}
+		});
+		service.submit(new Runnable() {
+			@Override
+			public void run() {
+				tableNode.put("top", table.loadTopHeader(0, columnCount).get("content"));
+			}
+		});
+		service.submit(new Runnable() {
+			@Override
+			public void run() {
+				tableNode.put("data", table.loadData(0, rowCount, 0, columnCount).get("content"));
+			}
+		});
+
+		service.shutdown();
+		service.awaitTermination(10, TimeUnit.SECONDS);
+		return tableNode.toString();
 	}
 
 	/**
@@ -94,20 +130,6 @@ public class ViewDisplay {
 	 */
 	public String getTitle() {
 		return title;
-	}
-
-	/**
-	 * iFrame src attribute, should be one of the HTML pages in <tt>render</tt>.
-	 */
-	public String getFrameSrc() {
-		return frameSrc;
-	}
-
-	/**
-	 * onLoad script to call when the iFrame loads. Should trigger rendering.
-	 */
-	public String getOnLoad() {
-		return onLoad;
 	}
 
 	/**

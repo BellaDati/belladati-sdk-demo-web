@@ -1,0 +1,158 @@
+<html>
+<head>
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script>
+	function init(data) {
+		$topTable = $("#top table");
+		$leftTable = $("#left table");
+		$dataTable = $("#data table");
+		$topTable.html(data.top);
+		$leftTable.html(data.left);
+		$dataTable.html(data.data);
+		var totalWidth = $("body").width();
+		var leftWidth = Math.min(Math.floor(totalWidth / 3), 240);
+		var rightWidth = totalWidth - leftWidth;
+		$("#left").css("width", leftWidth);
+		$("#top, #data").css("width", rightWidth);
+
+		var columnWidth = 0;
+		var columnCount = 0;
+		$topTable.find("th").each(function() {
+			columnWidth = Math.max(columnWidth, $(this).outerWidth());
+			columnCount++;
+		});
+
+		var rightInnerWidth = columnWidth * columnCount;
+		$topTable.css("width", rightInnerWidth);
+		$dataTable.css("width", rightInnerWidth);
+		// table-layout needs to be set after the width for Chrome
+		$topTable.css("table-layout", "fixed");
+		$dataTable.css("table-layout", "fixed");
+
+		var totalHeight = $("body").height();
+		var topHeight = $topTable.height();
+		var dataHeight = totalHeight - topHeight;
+		$("#left, #data").css("height", dataHeight);
+
+		$("#data").scroll(function() {
+			$("#top").scrollLeft($(this).scrollLeft());
+			$("#left").scrollTop($(this).scrollTop());
+		});
+
+		$(".ddlevel1").click(function() {
+			if (window.parent.loadProduct) {
+				window.parent.loadProduct($(this).text());
+			}
+		});
+	}
+</script>
+<style>
+body {
+	height: 100%;
+	margin: 0;
+	overflow: hidden;
+	font-family: Helvetica, Arial, sans-serif;
+	color: #585858;
+}
+
+.layout {
+	display: table;
+	height: 100%;
+}
+
+.row {
+	display: table-row;
+}
+
+.tile {
+	display: table-cell;
+}
+
+#top {
+	overflow-x: hidden;
+}
+
+#left {
+	overflow-x: scroll;
+	overflow-y: hidden;
+}
+
+#data {
+	overflow: scroll;
+}
+
+.inner table {
+	min-width: 100%;
+	border-collapse: collapse;
+}
+.row .tile:first-child {
+	border-right: 1px solid white;
+}
+.row:first-child .tile {
+	border-bottom: 1px solid white;
+}
+.inner table td,.inner table th {
+	border: 1px solid white;
+}
+.inner table tr:first-child td,.inner table tr:first-child th {
+	border-top: 0;
+}
+.inner table tr:last-child td,.inner table tr:last-child th {
+	border-bottom: 0;
+}
+.inner table td:first-child,.inner table th:first-child {
+	border-left: 0;
+}
+.inner table td:last-child,.inner table th:last-child {
+	border-right: 0;
+}
+
+.inner th,.inner td {
+	white-space: nowrap;
+	padding: 4px;
+}
+
+#top th {
+	text-align: center;
+}
+
+#left th {
+	text-align: left;
+	cursor: pointer;
+}
+
+#data td {
+	text-align: right;
+}
+
+th {
+	font-weight: normal;
+	background-color: rgb(184, 234, 250);
+}
+</style>
+</head>
+<body>
+	<div class="layout">
+		<div class="row">
+			<div id="top-left" class="tile"></div>
+			<div class="tile">
+				<div id="top" class="inner">
+					<table></table>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="tile">
+				<div id="left" class="inner">
+					<table></table>
+				</div>
+			</div>
+			<div class="tile">
+				<div id="data" class="inner">
+					<table></table>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
