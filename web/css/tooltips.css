@@ -1,0 +1,156 @@
+.chartTooltip {
+	font-family: sans-serif;
+	position: absolute;
+	font-size: 13px;
+	padding: 8px;
+	overflow: hidden;
+	border-style: solid;
+	background-color: white;
+	background-color: rgba(255, 255, 255, 0.9);
+	min-width: 220px;
+	max-width: 800px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
+	z-index: 100000000;
+}
+
+.chartTooltip .tooltip-icon-container {
+	text-align: center;
+}
+
+.chartTooltip ul {
+	margin: 0;
+}
+
+.chartTooltip li {
+	list-style-type: none;
+}
+
+.chartTooltip .tooltip-icon-container li {
+	cursor: pointer;
+	display: inline-block;
+	margin-bottom: 0.5em;
+}
+
+.chartTooltip .tooltip-value-container {
+	padding: 0 0.3em;
+	font-size: 110%;
+	color: #FFF;
+	opacity: 0.9;
+}
+
+.chartTooltip .tooltip-value-container li {
+	text-align: center;
+	border-bottom: 1px solid;
+	padding: 0.3em 0;
+}
+
+.chartTooltip .tooltip-value-container li:last-child {
+	border-bottom: none;
+}
+
+.chartTooltip .tooltip-drilldown-container select {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	box-sizing: border-box;
+	width: 100%;
+	margin-bottom: 0.3em;
+}
+
+.chartTooltip .tooltip-drilldown-container .drilldown-select {
+	margin-top: 0.5em;
+}
+
+.chartTooltip .tooltip-drilldown-container .drilldown-subset-select {
+	display: none;
+}
+
+.chartTooltip .tooltip-drilldown-container .set-drilldown-button {
+	margin-bottom: 0.5em;
+}
+
+.chartTooltip .tooltip-comment-container .add-comment-container {
+	display: none;
+}
+
+.chartTooltip .tooltip-comment-container .add-comment-container .add-comment-are
+a {
+	box-sizing: border-box;
+	width: 100%;
+	margin-top: 0.5em;
+	margin-bottom: 0.3em;
+}
+
+.chartTooltip .tooltip-comment-container .add-comment-container .add-comment-but
+ton {
+	margin-bottom: 0.5em;
+}
+
+.chartTooltip .tooltip-comment-container li {
+	border-bottom: 1px solid;
+	padding: 0.4em 0;
+}
+
+.chartTooltip .tooltip-comment-container li:first-child {
+	margin-top: 0.3em;
+}
+
+.chartTooltip .tooltip-comment-container li:last-child {
+	border: 0;
+}
+
+.chartTooltip .tooltip-comment-container li .comment-author {
+	color: #000;
+	font-weight: bold;
+}
+
+.chartTooltip .tooltip-comment-container li .comment-author:after {
+	content: ": ";
+}
+
+.chartTooltip .tooltip-comment-container li .comment-text {
+	color: #000;
+}
+
+.chartTooltip .tooltip-comment-container li .remove-comment {
+	display: none;
+	float: right;
+	cursor: pointer;
+}
+
+.chartTooltip.permanent .tooltip-comment-container .add-comment-container,.chartTooltip.permanent .tooltip-comment-container li .remove-comment
+	{
+	display: block;
+}
+
+.chartTooltipArrow {
+	opacity: 0.9;
+	position: absolute;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
+	z-index: 100000000;
+}
+
+.chartTooltipArrowIE,.chartTooltipArrowBgIE {
+	width: 0px;
+	height: 0px;
+	position: absolute;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
+}
+
+.chartTooltipArrowIE {
+	z-index: 100000000;
+}
+
+.chartTooltipArrowBgIE {
+	z-index: 10000000;
+}
+
+.chartTooltip::selection,.chartTooltip::-moz-selection {
+	background: white;
+}

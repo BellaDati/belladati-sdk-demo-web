@@ -7,10 +7,36 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>${reportName}</title>
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/css/style.css" />
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css" />
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/tooltips.css" />
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/kpi.css" />
+<script type="text/javascript" src="${pageContext.request.contextPath}/render/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/render/raphael.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/render/charts.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/render/kpi.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/render/ViewContextDisplay.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/render/chart-config.js"></script>
+<script>
+chartJson = {};
+kpiJson = {};
+loadViews = function() {
+	$(".wrapper.chart").each(function() {
+		var id = $(this).data("view-id");
+		var $container = $("#" + id);
+		$container.empty();
+		var chart = Charts.create(id, chartJson[id].content);
+		chart.resize($container.width(), $container.height());
+	});
+	$(".wrapper.kpi").each(function() {
+		var id = $(this).data("view-id");
+		var $container = $("#" + id);
+		$container.empty();
+		KPI.create(id, kpiJson[id]);
+	});
+};
+</script>
 </head>
-<body>
+<body onLoad="loadViews()">
 	<header>
 		<a class="logout button" href="${pageContext.request.contextPath}/logout">Logout</a>
 	</header>
@@ -44,28 +70,14 @@
 			</div>
 		</form>
 		<div>
-			<script>
-				chartJson = {};
-				chartLoaded = function(chart) {
-					// before this is called, JSON needs to be injected into chartJson
-					document.getElementById(chart).contentWindow.init(chartJson[chart]);
-				};
-				kpiJson = {};
-				kpiLoaded = function(kpi) {
-					// before this is called, JSON needs to be injected into kpiJson
-					document.getElementById(kpi).contentWindow.init(kpiJson[kpi]);
-				};
-			</script>
 			<c:forEach var="view" items="${views}">
 				<script>
 					 // the script defined for the view, injects JSON contents
 					${view.script}
 				</script>
-				<div class="wrapper">
+				<div class="wrapper ${view.cssClass}" id="wrapper-${view.id}" data-view-id="${view.id}">
 					<span class="title">${view.title}</span>
-					<iframe class="content ${view.cssClass}" id="${view.id}"
-						src="${pageContext.request.contextPath}${view.frameSrc}"
-						onload="${view.onLoad}"></iframe>
+					<div class="content" id="${view.id}"></div>
 				</div>
 			</c:forEach>
 		</div>

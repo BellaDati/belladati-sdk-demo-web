@@ -54,7 +54,7 @@ header .logout {
 	bottom: 1.1em;
 }
 
-header ~ * {
+#page-content {
 	margin-top: 4em;
 }
 

@@ -1,0 +1,38 @@
+.kpiEntry {
+	display: inline-block;
+	padding: 1em 1em;
+	font-size: 130%;
+}
+
+.kpiEntry .kpiEntryCaption {
+	margin-top: 0.5em;
+}
+
+.kpiEntry .kpiEntryValue {
+	font-size: 160%;
+	padding: 4px 6px;
+}
+
+.kpiEntry.x-small {
+	font-size: 100%;
+}
+
+.kpiEntry.small {
+	font-size: 115%;
+}
+
+.kpiEntry.large {
+	font-size: 160%;
+}
+
+.kpiEntry.x-large {
+	font-size: 200%;
+}
+
+.kpiEntry.xx-large {
+	font-size: 250%;
+}
+
+.kpiEntry .percent {
+	font-size: 70%;
+}

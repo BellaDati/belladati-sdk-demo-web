@@ -38,4 +38,4 @@ This will create a folder and file named
     
 You can deploy this file into a servlet container of your choice (e.g. [Tomcat](http://tomcat.apache.org/)).
 
-By default, the demo will be available on `http://your-server-here.com/api-demo-web/`. Just click the big green button and log in!
+By default, the demo will be available on `http://your-server-here.com/api-demo-web/`. Just click the button and log in!
