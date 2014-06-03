@@ -52,7 +52,7 @@ Table.create = function(id, data) {
 
 	var topHeight = $topTable.height();
 	var dataHeight = totalHeight - topHeight;
-	$("#left, #data").css("height", dataHeight);
+	$("#left, #data").css("max-height", dataHeight);
 
 	$("#data").scroll(function() {
 		$("#top").scrollLeft($(this).scrollLeft());

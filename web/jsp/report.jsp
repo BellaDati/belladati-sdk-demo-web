@@ -11,18 +11,32 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/tooltips.css" />
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/kpi.css" />
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/table.css" />
-<script type="text/javascript" src="${pageContext.request.contextPath}/render/jquery-1.11.1.min.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/render/raphael.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/render/charts.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/render/kpi.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/render/table.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/render/ViewContextDisplay.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/render/chart-config.js"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/pikaday.css" />
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/moment.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/pikaday.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/render/raphael.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/render/charts.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/render/kpi.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/render/table.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/render/ViewContextDisplay.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/render/chart-config.js"></script>
 <script>
 chartJson = {};
 kpiJson = {};
 tableJson = {};
+initDatePicker = function(field) {
+	return new Pikaday({
+		field: field,
+		format: "YYYY-MM-DD",
+		minDate: new Date('2000-01-01'),
+		maxDate: new Date('2020-12-31'),
+		yearRange: [2000,2020]
+	});
+}
 loadViews = function() {
+	initDatePicker($("#fromDate")[0]);
+	initDatePicker($("#toDate")[0]);
 	$(".wrapper.chart").each(function() {
 		var id = $(this).data("view-id");
 		var $container = $("#" + id);
@@ -47,6 +61,7 @@ loadViews = function() {
 </head>
 <body onLoad="loadViews()">
 	<header>
+		<a href="${pageContext.request.contextPath}"><img src="${pageContext.request.contextPath}/images/logo.png" /></a>
 		<a class="logout button" href="${pageContext.request.contextPath}/logout">Logout</a>
 	</header>
 	<div id="page-content">
@@ -73,6 +88,17 @@ loadViews = function() {
 					</div>
 				</div>
 			</c:forEach>
+			<div class="filter-attribute">
+				<span class="filter-title">Date Interval</span>
+				<div class="filter-items">
+					<div class="interval-item">
+						<label for="fromDate">From</label> <input type="text" id="fromDate" name="fromDate" placeholder="yyyy-mm-dd" value="${fromDate}" />
+					</div>
+					<div class="interval-item">
+						<label for="toDate">To</label> <input type="text" id="toDate" name="toDate" placeholder="yyyy-mm-dd" value="${toDate}" />
+					</div>
+				</div>
+			</div>
 			<div class="buttons">
 				<button type="submit" name="action" value="set">Filter</button>
 				<button type="submit" name="action" value="clear">Clear</button>

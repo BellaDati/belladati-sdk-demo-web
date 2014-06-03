@@ -3,8 +3,12 @@ package com.belladati.demo.controller;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -30,18 +34,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.belladati.demo.persist.FilterData;
+import com.belladati.demo.persist.ConfigData;
 import com.belladati.demo.view.ViewAttribute;
 import com.belladati.demo.view.ViewDisplay;
 import com.belladati.sdk.filter.Filter;
 import com.belladati.sdk.filter.Filter.MultiValueFilter;
 import com.belladati.sdk.filter.FilterOperation;
 import com.belladati.sdk.filter.FilterValue;
+import com.belladati.sdk.intervals.AbsoluteInterval;
+import com.belladati.sdk.intervals.DateUnit;
+import com.belladati.sdk.intervals.Interval;
 import com.belladati.sdk.report.Attribute;
 import com.belladati.sdk.report.AttributeValue;
 import com.belladati.sdk.report.Comment;
 import com.belladati.sdk.report.Report;
 import com.belladati.sdk.view.View;
+import com.belladati.sdk.view.ViewLoader;
 import com.belladati.sdk.view.ViewType;
 
 /**
@@ -53,7 +61,7 @@ import com.belladati.sdk.view.ViewType;
 public class ReportController {
 
 	private static final Logger logger = Logger.getLogger(ReportController.class.getName());
-	private static final String FILTER_DATA = "filters";
+	private static final String CONFIG_DATA = "config";
 
 	@Autowired
 	private ServiceManager serviceManager;
@@ -100,8 +108,8 @@ public class ReportController {
 		}
 		ModelAndView modelAndView = new ModelAndView("report");
 
-		Map<?, ?> sessionData = (Map<?, ?>) session.getAttribute(FILTER_DATA);
-		final FilterData filterData = sessionData != null ? (FilterData) sessionData.get(reportId) : null;
+		Map<?, ?> sessionConfigData = (Map<?, ?>) session.getAttribute(CONFIG_DATA);
+		final ConfigData configData = sessionConfigData != null ? (ConfigData) sessionConfigData.get(reportId) : null;
 		final Report report = serviceManager.getService().loadReport(reportId);
 		modelAndView.addObject("reportName", report.getName());
 		modelAndView.addObject("reportId", report.getId());
@@ -116,10 +124,13 @@ public class ReportController {
 				Future<?> future = service.submit(new Callable<Object>() {
 					@Override
 					public Object call() throws Exception {
-						if (filterData != null) {
-							return view.loadContent(filterData.get());
+						ViewLoader loader = view.createLoader();
+						if (configData != null) {
+							loader.addFilters(configData.getFilters());
+							loader.setDateInterval(configData.getDateInterval());
+							loader.setTimeInterval(configData.getTimeInterval());
 						}
-						return view.loadContent();
+						return loader.loadContent();
 					}
 				});
 				viewDisplays.add(new ViewDisplay(view, future));
@@ -169,8 +180,8 @@ public class ReportController {
 		service.shutdown();
 
 		modelAndView.addObject("viewAttributes", viewAttributes);
-		if (filterData != null) {
-			for (Filter<?> item : filterData.get()) {
+		if (configData != null) {
+			for (Filter<?> item : configData.getFilters()) {
 				for (ViewAttribute viewAttribute : viewAttributes) {
 					if (viewAttribute.getCode().equals(item.getAttribute().getCode())) {
 						List<String> values = new ArrayList<>();
@@ -181,43 +192,54 @@ public class ReportController {
 					}
 				}
 			}
+			if (configData.getDateInterval() != null) {
+				DateFormat dateWriter = new SimpleDateFormat("yyyy-MM-dd");
+				modelAndView.addObject("fromDate",
+					dateWriter.format(((AbsoluteInterval<DateUnit>) configData.getDateInterval()).getStart().getTime()));
+				modelAndView.addObject("toDate",
+					dateWriter.format(((AbsoluteInterval<DateUnit>) configData.getDateInterval()).getEnd().getTime()));
+			}
 		}
+
 		return modelAndView;
 	}
 
 	/**
-	 * Sets or clears filters for the given report.
+	 * Sets or clears the configuration for the given report.
 	 * 
-	 * @param reportId ID of the report to filter
-	 * @param action <tt>set</tt> to set a filter, otherwise it's cleared
-	 * @param request request containing filter parameters
+	 * @param reportId ID of the report to configure
+	 * @param action <tt>set</tt> to set a config, otherwise it's cleared
+	 * @param request request containing config parameters
 	 */
 	@RequestMapping(value = "/reports/{id}", method = RequestMethod.POST)
-	public ModelAndView setFilter(@PathVariable("id") String reportId, @RequestParam("action") String action,
-		HttpServletRequest request) {
-		// read filter storage from session, create if it doesn't exist
+	public ModelAndView setConfig(@PathVariable("id") String reportId, @RequestParam("action") String action,
+		@RequestParam("fromDate") String fromDate, @RequestParam("toDate") String toDate, HttpServletRequest request) {
+		// read config storage from session, create if it doesn't exist
 		@SuppressWarnings("unchecked")
-		Map<String, FilterData> sessionFilters = (Map<String, FilterData>) session.getAttribute(FILTER_DATA);
-		if (sessionFilters == null) {
-			sessionFilters = new HashMap<>();
-			session.setAttribute(FILTER_DATA, sessionFilters);
+		Map<String, ConfigData> sessionConfig = (Map<String, ConfigData>) session.getAttribute(CONFIG_DATA);
+		if (sessionConfig == null) {
+			sessionConfig = new HashMap<>();
+			session.setAttribute(CONFIG_DATA, sessionConfig);
 		}
 
-		// find filter data for given report, create if it doesn't exist
-		FilterData filterData = sessionFilters.get(reportId);
-		if (filterData == null) {
-			filterData = new FilterData(reportId);
-			sessionFilters.put(reportId, filterData);
+		// find config data for given report, create if it doesn't exist
+		ConfigData configData = sessionConfig.get(reportId);
+		if (configData == null) {
+			configData = new ConfigData(reportId);
+			sessionConfig.put(reportId, configData);
 		}
 
-		// create filter collection, empty to clear
+		// create config collection, empty to clear
 		Collection<? extends Filter<?>> filters = new ArrayList<>();
 
 		if ("set".equals(action)) {
 			// we have something to filter
 			filters = parseFilters(reportId, request);
+			configData.setFilters(filters);
+			configData.setDateInterval(parseInterval(fromDate, toDate));
+		} else {
+			configData.clear();
 		}
-		filterData.set(filters);
 		return new ModelAndView("redirect:/reports/" + reportId);
 	}
 
@@ -249,6 +271,28 @@ public class ReportController {
 			}
 		}
 		return filters.values();
+	}
+
+	/**
+	 * Creates a date interval based on the given from and to dates. To create a
+	 * valid interval, both date strings must be non-null and in yyyy-MM-dd
+	 * format.
+	 * 
+	 * @param fromDate first date of the interval
+	 * @param toDate last date of the interval
+	 * @return an interval, or <tt>null</tt> if any of the dates is invalid
+	 */
+	private Interval<DateUnit> parseInterval(String fromDate, String toDate) {
+		DateFormat parser = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar start = Calendar.getInstance();
+		Calendar end = Calendar.getInstance();
+		try {
+			start.setTime(parser.parse(fromDate));
+			end.setTime(parser.parse(toDate));
+			return new AbsoluteInterval<DateUnit>(DateUnit.DAY, start, end);
+		} catch (ParseException e) {
+			return null;
+		}
 	}
 
 	/**

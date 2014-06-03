@@ -10,6 +10,7 @@
 </head>
 <body>
 	<header>
+		<a href="${pageContext.request.contextPath}"><img src="${pageContext.request.contextPath}/images/logo.png" /></a>
 		<a class="logout button" href="${pageContext.request.contextPath}/logout">Logout</a>
 	</header>
 	<div id="page-content">
