@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.belladati.sdk.report.Attribute;
+import com.belladati.sdk.dataset.Attribute;
 import com.belladati.sdk.report.AttributeValue;
 
 /**

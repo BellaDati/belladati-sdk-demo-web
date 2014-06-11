@@ -42,8 +42,8 @@ public class AuthorizationController {
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ModelAndView login(HttpServletRequest request) {
 		// replace key and secret by your domain's key/secret
-		OAuthRequest oAuthRequest = serviceManager.initiateOAuth(key, secret);
-		return new ModelAndView("redirect:" + oAuthRequest.getAuthorizationUrl(getDeploymentUrl(request) + "/authorize"));
+		OAuthRequest oAuthRequest = serviceManager.initiateOAuth(key, secret, getDeploymentUrl(request) + "/authorize");
+		return new ModelAndView("redirect:" + oAuthRequest.getAuthorizationUrl());
 	}
 
 	/**

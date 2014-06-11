@@ -71,10 +71,11 @@ public class ServiceManager {
 	 * 
 	 * @param key OAuth key set in the domain settings
 	 * @param secret OAuth secret set in the domain settings
+	 * @param redirectUrl URL to redirect to after authorization
 	 * @return the pending OAuth request
 	 */
-	public OAuthRequest initiateOAuth(String key, String secret) {
-		OAuthRequest request = connection.oAuth(key, secret);
+	public OAuthRequest initiateOAuth(String key, String secret, String redirectUrl) {
+		OAuthRequest request = connection.oAuth(key, secret, redirectUrl);
 		session.setAttribute("pendingOAuth", request);
 		return request;
 	}
