@@ -39,6 +39,11 @@ button, input[type=submit], a.button {
 	color: #78C2DD;
 }
 
+.error-message {
+	margin-top: 2em;
+	color: #ff2b22;
+}
+
 header {
 	display: block;
 	position: absolute;

@@ -8,8 +8,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.belladati.sdk.auth.OAuthRequest;
+import com.belladati.sdk.exception.auth.AuthorizationException;
 
 /**
  * Controller handling logic related to authorization.
@@ -50,9 +52,12 @@ public class AuthorizationController {
 	 * Landing page after OAuth authorization. Completes OAuth.
 	 */
 	@RequestMapping(value = "/authorize", method = RequestMethod.GET)
-	public ModelAndView getAccessToken() {
-		// here we should catch AuthorizationExceptions and show an error
-		serviceManager.completeOAuth();
+	public ModelAndView requestAccessToken(RedirectAttributes redirectAttributes) {
+		try {
+			serviceManager.completeOAuth();
+		} catch (AuthorizationException e) {
+			redirectAttributes.addFlashAttribute("error", "Authentication failed: " + e.getMessage());
+		}
 		return new ModelAndView("redirect:/");
 	}
 
