@@ -25,6 +25,7 @@
 chartJson = {};
 kpiJson = {};
 tableJson = {};
+image = {};
 initDatePicker = function(field) {
 	return new Pikaday({
 		field: field,
@@ -55,6 +56,12 @@ loadViews = function() {
 		var $container = $("#" + id);
 		$container.empty();
 		Table.create(id, tableJson[id]);
+	});
+	$(".wrapper.image").each(function() {
+		var id = $(this).data("view-id");
+		var $container = $("#" + id);
+		$container.empty();
+		$container.append('<img id="theImg" src="data:image/png;base64,' + image[id] +'" />')
 	});
 };
 </script>

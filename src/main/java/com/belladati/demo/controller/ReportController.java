@@ -45,7 +45,6 @@ import com.belladati.sdk.filter.FilterValue;
 import com.belladati.sdk.intervals.AbsoluteInterval;
 import com.belladati.sdk.intervals.DateUnit;
 import com.belladati.sdk.intervals.Interval;
-import com.belladati.sdk.report.AttributeValue;
 import com.belladati.sdk.report.Comment;
 import com.belladati.sdk.report.Report;
 import com.belladati.sdk.view.View;
@@ -134,6 +133,15 @@ public class ReportController {
 					}
 				});
 				viewDisplays.add(new ViewDisplay(view, future));
+			} else if (view.getType() == ViewType.IMAGE) {
+				Future<?> future = service.submit(new Callable<Object>() {
+					@Override
+					public Object call() throws Exception {
+						ViewLoader loader = view.createLoader();
+						return loader.loadContent();
+					}
+				});
+				viewDisplays.add(new ViewDisplay(view, future));
 			}
 		}
 
@@ -185,7 +193,7 @@ public class ReportController {
 				for (ViewAttribute viewAttribute : viewAttributes) {
 					if (viewAttribute.getCode().equals(item.getAttribute().getCode())) {
 						List<String> values = new ArrayList<>();
-						for (AttributeValue value : ((MultiValueFilter) item).getValues()) {
+						for (com.belladati.sdk.dataset.AttributeValue value : ((MultiValueFilter) item).getValues()) {
 							values.add(value.getValue());
 						}
 						viewAttribute.setSelectedValues(values);

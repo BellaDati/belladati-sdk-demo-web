@@ -1,5 +1,7 @@
 package com.belladati.demo.view;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -8,6 +10,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
+
+import org.apache.commons.codec.binary.Base64;
+
+import com.belladati.sdk.view.ImageView;
 import com.belladati.sdk.view.TableView.Table;
 import com.belladati.sdk.view.View;
 import com.belladati.sdk.view.ViewType;
@@ -80,6 +87,16 @@ public class ViewDisplay {
 				logger.log(Level.WARNING, "Error getting data", e);
 			}
 			break;
+			
+		case IMAGE:
+			try {
+				script = "image['" + id + "'] = '" + postProcess((ImageView.Image) future.get()) + "'";
+			} catch (InterruptedException e) {
+				logger.log(Level.WARNING, "Error getting data", e);
+			} catch (ExecutionException e) {
+				logger.log(Level.WARNING, "Error getting data", e);
+			}
+			break;
 		default: // do nothing
 		}
 	}
@@ -87,6 +104,26 @@ public class ViewDisplay {
 	private String postProcess(JsonNode node) throws JsonProcessingException {
 		return new ObjectMapper().writeValueAsString(node);
 	}
+	
+	
+	private String postProcess(ImageView.Image image) {
+        String imageString = null;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        try {
+            ImageIO.write(image.getImage(), "png", bos);
+            byte[] imageBytes = bos.toByteArray();
+                                                
+            Base64 encoder = new Base64();
+            imageString = new String(encoder.encode(imageBytes));
+
+            bos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return imageString;
+	}
+	
 
 	private String postProcess(final Table table) throws InterruptedException {
 		final int rowCount = table.getRowCount();
