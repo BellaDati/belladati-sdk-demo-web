@@ -97,6 +97,17 @@ public class ViewDisplay {
 				logger.log(Level.WARNING, "Error getting data", e);
 			}
 			break;
+		case TEXT:
+			try {
+				script = "textJson['" + id + "'] = " + postProcess((JsonNode) future.get());
+			} catch (JsonProcessingException e) {
+				logger.log(Level.WARNING, "Error getting data", e);
+			} catch (InterruptedException e) {
+				logger.log(Level.WARNING, "Error getting data", e);
+			} catch (ExecutionException e) {
+				logger.log(Level.WARNING, "Error getting data", e);
+			}
+			break;
 		default: // do nothing
 		}
 	}

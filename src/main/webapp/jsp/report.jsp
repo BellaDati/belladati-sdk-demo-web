@@ -22,10 +22,11 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/render/ViewContextDisplay.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/render/chart-config.js"></script>
 <script>
-chartJson = {};
-kpiJson = {};
-tableJson = {};
-image = {};
+var chartJson = {};
+var kpiJson = {};
+var tableJson = {};
+var image = {};
+var textJson = {};
 initDatePicker = function(field) {
 	return new Pikaday({
 		field: field,
@@ -51,6 +52,13 @@ loadViews = function() {
 		$container.empty();
 		KPI.create(id, kpiJson[id]);
 	});
+	$(".wrapper.text").each(function() {
+		var id = $(this).data("view-id");
+		var $container = $("#" + id);
+		$container.empty();
+		$container.append(textJson[id].content);
+		
+	});
 	$(".wrapper.table").each(function() {
 		var id = $(this).data("view-id");
 		var $container = $("#" + id);
@@ -63,6 +71,8 @@ loadViews = function() {
 		$container.empty();
 		$container.append('<img id="theImg" src="data:image/png;base64,' + image[id] +'" />')
 	});
+	
+	
 };
 </script>
 </head>

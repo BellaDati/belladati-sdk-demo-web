@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +120,8 @@ public class ReportController {
 		// query view data
 		List<ViewDisplay> viewDisplays = new ArrayList<>();
 		for (final View view : report.getViews()) {
-			if (view.getType() == ViewType.CHART || view.getType() == ViewType.KPI || view.getType() == ViewType.TABLE) {
+			EnumSet<ViewType> supportedJsonViewTypes = EnumSet.of(ViewType.CHART,ViewType.KPI, ViewType.TABLE, ViewType.TEXT);
+			if (supportedJsonViewTypes.contains(view.getType())) {
 				Future<?> future = service.submit(new Callable<Object>() {
 					@Override
 					public Object call() throws Exception {
