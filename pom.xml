@@ -7,7 +7,7 @@
 	<packaging>war</packaging>
 	<name>BellaDati SDK Web Demo</name>
 	<properties>
-		<jetty.port>8080</jetty.port>
+		<jetty.port>9090</jetty.port>
 		<java.version>1.7</java.version>
 	</properties>
 
@@ -24,7 +24,7 @@
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.3</version>
-				<configuration>					
+				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
 			</plugin>
@@ -38,12 +38,12 @@
 					</httpConnector>
 					<webApp>
 						<contextPath>/</contextPath>
-						<resourceBases>							
+						<resourceBases>
 							<resourceBase>${project.basedir}/src/main/webapp</resourceBase>
 						</resourceBases>
 					</webApp>
 					<scanIntervalSeconds>10</scanIntervalSeconds>
-					<scanTargets>						
+					<scanTargets>
 						<scanTarget>${project.basedir}/web/main/webapp</scanTarget>
 					</scanTargets>
 				</configuration>
@@ -51,6 +51,11 @@
 		</plugins>
 	</build>
 	<dependencies>
+		<dependency>
+			<groupId>com.belladati</groupId>
+			<artifactId>sdk-java</artifactId>
+			<version>0.9.7-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
@@ -60,17 +65,17 @@
 			<groupId>jstl</groupId>
 			<artifactId>jstl</artifactId>
 			<version>1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>com.belladati</groupId>
-			<artifactId>sdk-java</artifactId>
-			<version>0.9.7-SNAPSHOT</version>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<version>3.1.0</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.3.2</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>

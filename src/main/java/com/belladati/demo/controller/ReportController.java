@@ -24,8 +24,10 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +41,7 @@ import com.belladati.demo.persist.ConfigData;
 import com.belladati.demo.view.ViewAttribute;
 import com.belladati.demo.view.ViewDisplay;
 import com.belladati.sdk.dataset.Attribute;
+import com.belladati.sdk.exception.server.MethodNotAllowedException;
 import com.belladati.sdk.filter.Filter;
 import com.belladati.sdk.filter.Filter.MultiValueFilter;
 import com.belladati.sdk.filter.FilterOperation;
@@ -51,6 +54,7 @@ import com.belladati.sdk.report.Report;
 import com.belladati.sdk.view.View;
 import com.belladati.sdk.view.ViewLoader;
 import com.belladati.sdk.view.ViewType;
+import com.belladati.sdk.view.export.ViewExport;
 
 /**
  * Controller handling reports.
@@ -327,6 +331,30 @@ public class ReportController {
 		}
 		return null;
 	}
+	
+		
+	@RequestMapping(value = "/views/{viewId}/export/pdf", method = RequestMethod.GET, produces = "application/pdf")
+	@ResponseBody
+	public void exportViewToPdf(@PathVariable String viewId, HttpServletResponse response) {
+		ViewExport viewExport = null;
+		try {			
+			viewExport = serviceManager.getService().createViewExporter().exportToPdf(viewId);																									
+		} catch(MethodNotAllowedException e) {			
+				try {
+					response.sendError(405);
+				} catch (IOException e1) {
+					logger.log(Level.WARNING, "Error sending 405 http error", e1);
+				}
+				return;
+		} 
+		
+		try {
+			IOUtils.copy(viewExport.getInputStream(), response.getOutputStream());			
+		} catch (IOException e) {
+			logger.log(Level.WARNING, "Error exporting to PDF", e);
+		}		
+	}
+	
 
 	/**
 	 * Posts a comment to the report with the given ID.

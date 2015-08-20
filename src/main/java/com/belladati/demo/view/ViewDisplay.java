@@ -33,6 +33,7 @@ public class ViewDisplay {
 	private static final Logger logger = Logger.getLogger(ViewDisplay.class.getName());
 
 	private final String id;
+	private final String urlId;
 	private final String title;
 	private final ViewType type;
 	private final Future<?> future;
@@ -40,6 +41,7 @@ public class ViewDisplay {
 
 	public ViewDisplay(View view, Future<?> future) {
 		this.id = view.getType().name().toLowerCase() + "-" + view.getId();
+		this.urlId = view.getId();
 		this.title = view.getName();
 		this.type = view.getType();
 		this.future = future;
@@ -193,4 +195,14 @@ public class ViewDisplay {
 	public String getCssClass() {
 		return type.name().toLowerCase();
 	}
+
+	public String getUrlId() {
+		return urlId;
+	}
+
+	public ViewType getType() {
+		return type;
+	}
+	
+	
 }

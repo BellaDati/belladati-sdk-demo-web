@@ -130,6 +130,7 @@ loadViews = function() {
 				<div class="wrapper ${view.cssClass}" id="wrapper-${view.id}" data-view-id="${view.id}">
 					<span class="title">${view.title}</span>
 					<div class="content" id="${view.id}"></div>
+					<span><a href="${pageContext.request.contextPath}/views/${view.urlId}/export/pdf">PDF</a></span>										
 				</div>
 			</c:forEach>
 		</div>
