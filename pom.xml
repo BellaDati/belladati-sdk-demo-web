@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>api-demo-web</groupId>
 	<artifactId>api-demo-web</artifactId>
-	<version>0.9.7-SNAPSHOT</version>
+	<version>0.9.7</version>
 	<packaging>war</packaging>
 	<name>BellaDati SDK Web Demo</name>
 	<properties>
@@ -54,7 +54,7 @@
 		<dependency>
 			<groupId>com.belladati</groupId>
 			<artifactId>sdk-java</artifactId>
-			<version>0.9.7-SNAPSHOT</version>
+			<version>0.9.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
